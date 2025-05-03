@@ -2,18 +2,23 @@
 
 import { useEffect, useRef } from "react"
 import { motion, useAnimation, useInView } from "framer-motion"
-import { ArrowRight, Mail, Star } from "lucide-react"
+import { ArrowRight, Mail } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { PageTransition } from "@/components/page-transition"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { ScrollIndicator } from "@/components/scroll-animations"
+import { AnimatedLink, AnimatedButton } from "@/components/animated-link"
+import { ServiceCard3D } from "@/components/service-card-3d"
+import { TestimonialCard3D } from "@/components/testimonial-card-3d"
 
 export default function Home() {
   return (
     <PageTransition>
       <div className="min-h-screen bg-[#161616] text-[#E9E7E2]">
         <Header />
+        <ScrollIndicator />
 
         <main>
           {/* Hero Section */}
@@ -48,13 +53,13 @@ export default function Home() {
                 transition={{ delay: 4, duration: 0.8 }}
                 className="mt-12"
               >
-                <Link
-                  href="#contact"
+                <AnimatedButton
                   className="px-8 py-4 bg-[#FF5001] text-[#161616] font-bold rounded-full hover:bg-[#FF5001]/90 transition-all duration-300 inline-flex items-center group"
+                  cursorText="Connect"
                 >
                   Let's Connect
                   <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                </AnimatedButton>
               </motion.div>
             </div>
 
@@ -125,17 +130,17 @@ export default function Home() {
               </div>
 
               <div className="grid md:grid-cols-3 gap-8">
-                <ServiceCard
+                <ServiceCard3D
                   title="Brand Strategy"
                   description="Developing comprehensive brand strategies that position your business for success in competitive markets."
                   delay={0.1}
                 />
-                <ServiceCard
+                <ServiceCard3D
                   title="Digital Strategy"
                   description="Creating digital ecosystems that amplify your brand's presence and engage audiences across platforms."
                   delay={0.3}
                 />
-                <ServiceCard
+                <ServiceCard3D
                   title="Consultancy"
                   description="Providing expert guidance to navigate complex brand challenges and identify growth opportunities."
                   delay={0.5}
@@ -179,25 +184,25 @@ export default function Home() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-8">
-                <TestimonialCard
+                <TestimonialCard3D
                   quote="Sakib's strategic approach completely transformed our brand positioning. His insights helped us connect with our audience in ways we never thought possible."
                   author="Sarah Johnson"
                   company="CEO, Nexus Technologies"
                   delay={0.1}
                 />
-                <TestimonialCard
+                <TestimonialCard3D
                   quote="Working with Zoolyum was a game-changer for our digital presence. The strategic vision and creative execution exceeded our expectations at every turn."
                   author="Michael Chen"
                   company="Marketing Director, Elevate"
                   delay={0.3}
                 />
-                <TestimonialCard
+                <TestimonialCard3D
                   quote="Sakib has an incredible ability to identify the essence of a brand and translate it into powerful market positioning. His work was instrumental to our success."
                   author="Jessica Williams"
                   company="Founder, Horizon"
                   delay={0.5}
                 />
-                <TestimonialCard
+                <TestimonialCard3D
                   quote="The depth of strategic thinking combined with creative excellence makes Zoolyum truly unique. Our brand transformation has driven measurable business results."
                   author="David Rodriguez"
                   company="COO, Pulse"
@@ -470,33 +475,6 @@ function AnimatedSection({ children, id, className = "" }) {
 }
 
 // Service Card Component
-function ServiceCard({ title, description, delay = 0 }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ delay, duration: 0.5 }}
-      className="bg-[#212121] p-8 rounded-2xl border border-[#333333] hover:border-[#FF5001]/50 transition-all duration-300 group"
-    >
-      <div className="w-16 h-16 bg-[#FF5001]/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#FF5001]/20 transition-all duration-300">
-        <div className="w-8 h-8 text-[#FF5001]">
-          <Star className="w-full h-full" />
-        </div>
-      </div>
-      <h3 className="text-2xl font-bold mb-4 group-hover:text-[#FF5001] transition-colors duration-300">{title}</h3>
-      <p className="text-[#E9E7E2]/70">{description}</p>
-      <div className="mt-6 pt-6 border-t border-[#333333]">
-        <Link href="#contact" className="text-[#FF5001] font-medium inline-flex items-center group/link">
-          Learn More
-          <ArrowRight className="ml-2 w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-        </Link>
-      </div>
-    </motion.div>
-  )
-}
-
-// Portfolio Item Component
 function PortfolioItem({ title, category, delay = 0 }) {
   return (
     <motion.div
@@ -518,37 +496,13 @@ function PortfolioItem({ title, category, delay = 0 }) {
       <div className="absolute inset-0 bg-gradient-to-t from-[#161616] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
         <span className="text-[#FF5001] text-sm">{category}</span>
         <h3 className="text-xl font-bold mt-2">{title}</h3>
-        <Link href="#" className="mt-4 inline-flex items-center text-[#E9E7E2] hover:text-[#FF5001] transition-colors">
+        <AnimatedLink
+          href="#"
+          className="mt-4 inline-flex items-center text-[#E9E7E2] hover:text-[#FF5001] transition-colors"
+        >
           View Project
           <ArrowRight className="ml-2 w-4 h-4" />
-        </Link>
-      </div>
-    </motion.div>
-  )
-}
-
-// Testimonial Card Component
-function TestimonialCard({ quote, author, company, delay = 0 }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ delay, duration: 0.5 }}
-      className="bg-[#212121] p-8 rounded-2xl border border-[#333333]"
-    >
-      <div className="text-[#FF5001] mb-6">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10 11L8 17H5L7 11H5V5H11V11H10ZM18 11L16 17H13L15 11H13V5H19V11H18Z" fill="currentColor" />
-        </svg>
-      </div>
-      <p className="text-lg mb-6">{quote}</p>
-      <div className="flex items-center">
-        <div className="w-12 h-12 rounded-full bg-[#333333] mr-4"></div>
-        <div>
-          <h4 className="font-bold">{author}</h4>
-          <p className="text-sm text-[#E9E7E2]/70">{company}</p>
-        </div>
+        </AnimatedLink>
       </div>
     </motion.div>
   )

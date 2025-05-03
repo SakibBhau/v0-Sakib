@@ -7,6 +7,7 @@ import { PageTransition } from "@/components/page-transition"
 import { motion } from "framer-motion"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { ProjectCard3D } from "@/components/project-card-3d"
 
 export default function WorkPage() {
   return (
@@ -29,7 +30,7 @@ export default function WorkPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {projects.map((project, index) => (
-                <ProjectCard key={index} project={project} index={index} />
+                <ProjectCard3D key={index} project={project} index={index} />
               ))}
             </div>
 

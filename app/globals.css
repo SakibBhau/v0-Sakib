@@ -55,8 +55,144 @@
   }
   body {
     @apply bg-background text-foreground;
+    cursor: none;
   }
   html {
     scroll-behavior: smooth;
   }
+
+  /* Hide default cursor when custom cursor is active */
+  @media (pointer: fine) {
+    * {
+      cursor: none !important;
+    }
+  }
+
+  /* But show default cursor on mobile/touch devices */
+  @media (pointer: coarse) {
+    * {
+      cursor: auto !important;
+    }
+
+    .custom-cursor {
+      display: none !important;
+    }
+  }
+
+  /* Animation for elements entering viewport */
+  .animate-on-scroll {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .animate-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Hover effects for interactive elements */
+  a,
+  button,
+  [role="button"],
+  [data-interactive="true"] {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* Text selection styling */
+  ::selection {
+    background-color: rgba(255, 80, 1, 0.3);
+    color: #e9e7e2;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #161616;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #ff5001;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #ff6a30;
+  }
+
+  /* 3D card optimizations */
+  .card-3d {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  .card-3d * {
+    transform-style: preserve-3d;
+  }
+
+  /* Force hardware acceleration for smoother animations */
+  .transform-gpu {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000;
+    will-change: transform;
+  }
+}
+
+/* Magnetic element styles */
+.magnetic-element {
+  transform-style: preserve-3d;
+  transform: perspective(1000px);
+}
+
+.magnetic-content {
+  transform-style: preserve-3d;
+}
+
+/* Text reveal animation */
+.reveal-text {
+  display: inline-block;
+  overflow: hidden;
+}
+
+.reveal-text span {
+  display: inline-block;
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.reveal-text.is-visible span {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(90deg, #ff5001, #ff8f66);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  display: inline-block;
+}
+
+/* Shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, rgba(255, 80, 1, 0), rgba(255, 80, 1, 0.2), rgba(255, 80, 1, 0));
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
 }

@@ -3,6 +3,9 @@ import "./globals.css"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Providers } from "./providers"
+import { EnhancedCursor } from "@/components/enhanced-cursor"
+import { EnhancedClickAnimation } from "@/components/enhanced-click-animation"
+import { ScrollProgress } from "@/components/scroll-animations"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -21,7 +24,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <Providers>{children}</Providers>
+          <Providers>
+            <ScrollProgress />
+            <EnhancedCursor />
+            <EnhancedClickAnimation />
+            {children}
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

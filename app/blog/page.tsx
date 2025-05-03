@@ -7,6 +7,7 @@ import { PageTransition } from "@/components/page-transition"
 import { motion } from "framer-motion"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { BlogCard3D } from "@/components/blog-card-3d"
 
 export default function BlogPage() {
   return (
@@ -29,7 +30,7 @@ export default function BlogPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {blogPosts.map((post, index) => (
-                <BlogCard key={index} post={post} index={index} />
+                <BlogCard3D key={index} post={post} index={index} />
               ))}
             </div>
 
