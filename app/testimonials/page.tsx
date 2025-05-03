@@ -9,9 +9,9 @@ import { Footer } from "@/components/footer"
 import { TestimonialCard3D } from "@/components/testimonial-card-3d"
 import { ScrollReveal } from "@/components/scroll-animations/scroll-reveal"
 import { StaggerReveal } from "@/components/scroll-animations/stagger-reveal"
-import { TextReveal } from "@/components/scroll-animations/text-reveal"
 import { ImageReveal } from "@/components/scroll-animations/image-reveal"
 import { CounterAnimation } from "@/components/scroll-animations/counter-animation"
+import { PageHeadline } from "@/components/page-headline"
 
 export default function TestimonialsPage() {
   return (
@@ -21,18 +21,11 @@ export default function TestimonialsPage() {
 
         <main className="pt-24">
           <section className="container mx-auto px-4 py-12">
-            <div className="flex flex-col items-center text-center mb-16">
-              <ScrollReveal>
-                <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">Client Stories</span>
-                <TextReveal type="words" className="text-4xl md:text-6xl font-bold mt-2 mb-4">
-                  Success Stories
-                </TextReveal>
-                <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto">
-                  Hear from the brands and businesses that have experienced the transformative power of strategic
-                  alchemy.
-                </p>
-              </ScrollReveal>
-            </div>
+            <PageHeadline
+              eyebrow="Client Stories"
+              title="Transformative Success Stories"
+              description="Hear from the brands and businesses that have experienced the transformative power of our strategic approach and creative excellence."
+            />
 
             {/* Featured Testimonial */}
             <ScrollReveal className="mb-16" delay={0.2}>
@@ -47,12 +40,13 @@ export default function TestimonialsPage() {
                         />
                       </svg>
                     </div>
-                    <TextReveal type="lines" className="text-xl md:text-2xl mb-8">
-                      "The rebrand has been transformative for our business. Not only do we have a visual identity that
-                      truly represents our vision, but the strategic foundation has aligned our entire organization and
-                      clarified our market position. Since launching, we've seen tangible business results and received
-                      overwhelmingly positive feedback from clients and partners."
-                    </TextReveal>
+                    <p className="text-xl md:text-2xl mb-8 italic">
+                      "The rebrand has been <span className="text-[#FF5001]">transformative</span> for our business. Not
+                      only do we have a visual identity that truly represents our vision, but the strategic foundation
+                      has aligned our entire organization and clarified our market position. Since launching, we've seen
+                      tangible business results and received overwhelmingly positive feedback from clients and
+                      partners."
+                    </p>
                     <div className="flex items-center">
                       <div className="w-16 h-16 rounded-full bg-[#333333] mr-4 overflow-hidden">
                         <Image
@@ -98,13 +92,12 @@ export default function TestimonialsPage() {
 
             {/* Stats Section */}
             <div className="py-16 border-t border-[#333333]">
-              <ScrollReveal className="text-center mb-16">
-                <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">Results</span>
-                <TextReveal className="text-4xl font-bold mt-2 mb-4">Measurable Impact</TextReveal>
-                <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto">
-                  Our strategic approach delivers tangible results for our clients across various metrics.
-                </p>
-              </ScrollReveal>
+              <PageHeadline
+                eyebrow="Results"
+                title="Measurable Business Impact"
+                description="Our strategic approach delivers tangible results for our clients across various metrics."
+                size="medium"
+              />
 
               <StaggerReveal className="grid grid-cols-2 md:grid-cols-4 gap-8">
                 {stats.map((stat, index) => (

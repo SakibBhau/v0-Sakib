@@ -8,7 +8,7 @@ import { Footer } from "@/components/footer"
 import { BlogCard3D } from "@/components/blog-card-3d"
 import { ScrollReveal } from "@/components/scroll-animations/scroll-reveal"
 import { StaggerReveal } from "@/components/scroll-animations/stagger-reveal"
-import { TextReveal } from "@/components/scroll-animations/text-reveal"
+import { PageHeadline } from "@/components/page-headline"
 
 export default function BlogPage() {
   return (
@@ -18,18 +18,12 @@ export default function BlogPage() {
 
         <main className="pt-24">
           <section className="container mx-auto px-4 py-12">
-            <div className="flex flex-col items-center text-center mb-16">
-              <ScrollReveal>
-                <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">Insights</span>
-                <TextReveal type="words" className="text-4xl md:text-6xl font-bold mt-2 mb-4">
-                  Brand Alchemy Blog
-                </TextReveal>
-                <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto">
-                  Thoughts, strategies, and insights on brand development, digital transformation, and market
-                  positioning.
-                </p>
-              </ScrollReveal>
-            </div>
+            <PageHeadline
+              eyebrow="Insights"
+              title="Strategic Brand Insights & Perspectives"
+              description="Explore our collection of thought leadership on brand development, digital transformation, and market positioning strategies."
+              titleGradient={true}
+            />
 
             <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {blogPosts.map((post, index) => (

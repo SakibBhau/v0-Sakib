@@ -11,10 +11,14 @@ interface StaggerRevealProps {
   className?: string
   delay?: number
   staggerDelay?: number
+  mobileStaggerDelay?: number
   threshold?: number
   once?: boolean
   animation?: "fade" | "slide" | "scale" | "fade-slide" | "fade-scale"
   direction?: "up" | "down" | "left" | "right"
+  mobileAnimation?: "fade" | "slide" | "scale" | "fade-slide" | "fade-scale"
+  mobileDirection?: "up" | "down" | "left" | "right"
+  mobileDuration?: number
 }
 
 export function StaggerReveal({
@@ -22,16 +26,25 @@ export function StaggerReveal({
   className = "",
   delay = 0,
   staggerDelay = 0.1,
+  mobileStaggerDelay,
   threshold = 0.1,
   once = true,
   animation = "fade-slide",
   direction = "up",
+  mobileAnimation,
+  mobileDirection,
+  mobileDuration,
 }: StaggerRevealProps) {
-  const { ref, controls } = useScrollAnimation({
+  const { ref, controls, isMobile } = useScrollAnimation({
     threshold,
     once,
     delay,
   })
+
+  // Use mobile-specific animation and direction if provided and on mobile
+  const effectiveAnimation = isMobile && mobileAnimation ? mobileAnimation : animation
+  const effectiveDirection = isMobile && mobileDirection ? mobileDirection : direction
+  const effectiveStaggerDelay = isMobile && mobileStaggerDelay !== undefined ? mobileStaggerDelay : staggerDelay
 
   // Define animation variants based on the animation type and direction
   const getContainerVariants = () => {
@@ -40,7 +53,7 @@ export function StaggerReveal({
       visible: {
         opacity: 1,
         transition: {
-          staggerChildren: staggerDelay,
+          staggerChildren: effectiveStaggerDelay,
           delayChildren: delay,
         },
       },
@@ -48,43 +61,48 @@ export function StaggerReveal({
   }
 
   const getItemVariants = () => {
-    switch (animation) {
+    // Adjust values for mobile
+    const slideDistance = isMobile ? 20 : 50
+    const scaleValue = isMobile ? 0.95 : 0.8
+    const duration = isMobile ? mobileDuration || 0.4 : 0.5
+
+    switch (effectiveAnimation) {
       case "fade":
         return {
           hidden: { opacity: 0 },
           visible: {
             opacity: 1,
-            transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+            transition: { duration, ease: [0.22, 1, 0.36, 1] },
           },
         }
       case "slide":
         return {
           hidden: {
-            x: direction === "left" ? -50 : direction === "right" ? 50 : 0,
-            y: direction === "up" ? 50 : direction === "down" ? -50 : 0,
+            x: effectiveDirection === "left" ? -slideDistance : effectiveDirection === "right" ? slideDistance : 0,
+            y: effectiveDirection === "up" ? slideDistance : effectiveDirection === "down" ? -slideDistance : 0,
           },
           visible: {
             x: 0,
             y: 0,
-            transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+            transition: { duration, ease: [0.22, 1, 0.36, 1] },
           },
         }
       case "scale":
         return {
-          hidden: { scale: 0.8, opacity: 0 },
+          hidden: { scale: scaleValue, opacity: 0 },
           visible: {
             scale: 1,
             opacity: 1,
-            transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+            transition: { duration, ease: [0.22, 1, 0.36, 1] },
           },
         }
       case "fade-scale":
         return {
-          hidden: { opacity: 0, scale: 0.9 },
+          hidden: { opacity: 0, scale: isMobile ? 0.95 : 0.9 },
           visible: {
             opacity: 1,
             scale: 1,
-            transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+            transition: { duration, ease: [0.22, 1, 0.36, 1] },
           },
         }
       case "fade-slide":
@@ -92,14 +110,23 @@ export function StaggerReveal({
         return {
           hidden: {
             opacity: 0,
-            x: direction === "left" ? -30 : direction === "right" ? 30 : 0,
-            y: direction === "up" ? 30 : direction === "down" ? -30 : 0,
+            x: effectiveDirection === "left" ? -30 : effectiveDirection === "right" ? 30 : 0,
+            y:
+              effectiveDirection === "up"
+                ? isMobile
+                  ? 20
+                  : 30
+                : effectiveDirection === "down"
+                  ? isMobile
+                    ? -20
+                    : -30
+                  : 0,
           },
           visible: {
             opacity: 1,
             x: 0,
             y: 0,
-            transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+            transition: { duration, ease: [0.22, 1, 0.36, 1] },
           },
         }
     }
@@ -108,13 +135,31 @@ export function StaggerReveal({
   const containerVariants = getContainerVariants()
   const itemVariants = getItemVariants()
 
+  // Limit the number of animated children on mobile for performance
+  const childrenArray = React.Children.toArray(children)
+  const maxAnimatedItems = isMobile ? 6 : childrenArray.length
+
   return (
     <motion.div ref={ref} className={className} initial="hidden" animate={controls} variants={containerVariants}>
       {React.Children.map(children, (child, index) => {
         if (!React.isValidElement(child)) return child
 
+        // For mobile, only animate the first few items for performance
+        if (isMobile && index >= maxAnimatedItems) {
+          return (
+            <motion.div key={index} initial={{ opacity: 1 }}>
+              {child}
+            </motion.div>
+          )
+        }
+
         return (
-          <motion.div key={index} variants={itemVariants}>
+          <motion.div
+            key={index}
+            variants={itemVariants}
+            // Improve touch response
+            whileTap={isMobile ? { scale: 1 } : undefined}
+          >
             {child}
           </motion.div>
         )

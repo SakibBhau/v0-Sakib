@@ -8,7 +8,7 @@ import { Footer } from "@/components/footer"
 import { ProjectCard3D } from "@/components/project-card-3d"
 import { ScrollReveal } from "@/components/scroll-animations/scroll-reveal"
 import { StaggerReveal } from "@/components/scroll-animations/stagger-reveal"
-import { TextReveal } from "@/components/scroll-animations/text-reveal"
+import { PageHeadline } from "@/components/page-headline"
 
 export default function WorkPage() {
   return (
@@ -18,18 +18,11 @@ export default function WorkPage() {
 
         <main className="pt-24">
           <section className="container mx-auto px-4 py-12">
-            <div className="flex flex-col items-center text-center mb-16">
-              <ScrollReveal>
-                <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">Portfolio</span>
-                <TextReveal type="words" className="text-4xl md:text-6xl font-bold mt-2 mb-4">
-                  Our Work
-                </TextReveal>
-                <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto">
-                  Explore our portfolio of brand transformations and digital strategy projects that have helped
-                  businesses achieve their goals.
-                </p>
-              </ScrollReveal>
-            </div>
+            <PageHeadline
+              eyebrow="Portfolio"
+              title="Strategic Brand Transformations"
+              description="Explore our portfolio of brand evolution projects that have helped businesses achieve remarkable growth and market presence."
+            />
 
             <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {projects.map((project, index) => (

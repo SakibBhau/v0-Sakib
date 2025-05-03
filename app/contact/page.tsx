@@ -9,7 +9,7 @@ import { Mail, MapPin, Phone, Clock, Send } from "lucide-react"
 import { Card3D } from "@/components/card-3d"
 import { ScrollReveal } from "@/components/scroll-animations/scroll-reveal"
 import { StaggerReveal } from "@/components/scroll-animations/stagger-reveal"
-import { TextReveal } from "@/components/scroll-animations/text-reveal"
+import { PageHeadline } from "@/components/page-headline"
 
 export default function ContactPage() {
   return (
@@ -19,18 +19,12 @@ export default function ContactPage() {
 
         <main className="pt-24">
           <section className="container mx-auto px-4 py-12">
-            <div className="flex flex-col items-center text-center mb-16">
-              <ScrollReveal>
-                <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">Get In Touch</span>
-                <TextReveal type="words" className="text-4xl md:text-6xl font-bold mt-2 mb-4">
-                  Let's Create Something Extraordinary
-                </TextReveal>
-                <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto">
-                  Ready to transform your brand through strategic alchemy? Let's connect and explore how we can elevate
-                  your business to new heights.
-                </p>
-              </ScrollReveal>
-            </div>
+            <PageHeadline
+              eyebrow="Get In Touch"
+              title="Let's Create Something Extraordinary Together"
+              description="Ready to transform your brand through strategic alchemy? Connect with us to explore how we can elevate your business to new heights."
+              titleGradient={true}
+            />
 
             <div className="grid md:grid-cols-2 gap-12">
               {/* Contact Form */}

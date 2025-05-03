@@ -8,7 +8,7 @@ import { Footer } from "@/components/footer"
 import { ServiceCard3D } from "@/components/service-card-3d"
 import { ScrollReveal } from "@/components/scroll-animations/scroll-reveal"
 import { StaggerReveal } from "@/components/scroll-animations/stagger-reveal"
-import { TextReveal } from "@/components/scroll-animations/text-reveal"
+import { PageHeadline } from "@/components/page-headline"
 
 export default function ServicesPage() {
   return (
@@ -18,19 +18,20 @@ export default function ServicesPage() {
 
         <main className="pt-24">
           <section className="container mx-auto px-4 py-12">
-            <div className="flex flex-col items-center text-center mb-16">
-              <ScrollReveal>
-                <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">What We Offer</span>
-                <TextReveal type="words" className="text-4xl md:text-6xl font-bold mt-2 mb-4">
-                  Brand Alchemy Services
-                </TextReveal>
-                <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto">
-                  Transforming visions into powerful brand realities through strategic thinking and creative excellence.
-                </p>
-              </ScrollReveal>
-            </div>
+            <PageHeadline
+              eyebrow="What We Offer"
+              title="Strategic Brand Alchemy Services"
+              description="Transforming ordinary brands into extraordinary market forces through our proven methodology and creative excellence."
+              titleGradient={true}
+            />
 
-            <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+            <StaggerReveal
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+              staggerDelay={0.1}
+              mobileStaggerDelay={0.05}
+              animation="fade-slide"
+              mobileAnimation="fade"
+            >
               <ServiceCard3D
                 title="Brand Strategy"
                 description="Developing comprehensive brand strategies that position your business for success in competitive markets."
@@ -59,16 +60,18 @@ export default function ServicesPage() {
 
             {/* Process Section */}
             <div className="py-16 border-t border-[#333333]">
-              <ScrollReveal className="text-center mb-16">
-                <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">Our Approach</span>
-                <TextReveal className="text-4xl font-bold mt-2 mb-4">The Alchemy Process</TextReveal>
-                <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto">
-                  Our systematic approach transforms ordinary brands into extraordinary market forces through a proven
-                  methodology.
-                </p>
-              </ScrollReveal>
+              <PageHeadline
+                eyebrow="Our Approach"
+                title="The Four-Step Alchemy Process"
+                description="Our systematic approach transforms ordinary brands into extraordinary market forces through a proven methodology."
+                size="medium"
+              />
 
-              <StaggerReveal className="grid md:grid-cols-4 gap-8">
+              <StaggerReveal
+                className="grid grid-cols-1 grid-cols-2 md:grid-cols-4 gap-8"
+                staggerDelay={0.15}
+                mobileStaggerDelay={0.08}
+              >
                 {processSteps.map((step, index) => (
                   <ProcessStep key={index} step={step} />
                 ))}
@@ -76,7 +79,7 @@ export default function ServicesPage() {
             </div>
 
             {/* CTA Section */}
-            <ScrollReveal className="py-16 mt-16 bg-[#1A1A1A] rounded-2xl" delay={0.2}>
+            <ScrollReveal className="py-16 mt-16 bg-[#1A1A1A] rounded-2xl" delay={0.2} mobileAnimation="fade">
               <div className="text-center">
                 <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Transform Your Brand?</h2>
                 <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto mb-8">

@@ -12,6 +12,8 @@ interface TextRevealProps {
   once?: boolean
   type?: "words" | "chars" | "lines"
   staggerDelay?: number
+  mobileType?: "words" | "chars" | "lines" | "none"
+  mobileStaggerDelay?: number
 }
 
 export function TextReveal({
@@ -22,15 +24,21 @@ export function TextReveal({
   once = true,
   type = "words",
   staggerDelay = 0.03,
+  mobileType,
+  mobileStaggerDelay,
 }: TextRevealProps) {
-  const { ref, controls } = useScrollAnimation({
+  const { ref, controls, isMobile } = useScrollAnimation({
     threshold,
     once,
     delay,
   })
 
+  // Use mobile-specific type if provided and on mobile
+  const effectiveType = isMobile && mobileType !== undefined ? mobileType : type
+  const effectiveStaggerDelay = isMobile && mobileStaggerDelay !== undefined ? mobileStaggerDelay : staggerDelay
+
   // If children is not a string, just wrap it in a motion div
-  if (typeof children !== "string") {
+  if (typeof children !== "string" || (isMobile && mobileType === "none")) {
     return (
       <motion.div
         ref={ref}
@@ -41,7 +49,7 @@ export function TextReveal({
           hidden: { opacity: 0 },
           visible: {
             opacity: 1,
-            transition: { duration: 0.5, delay },
+            transition: { duration: isMobile ? 0.4 : 0.5, delay },
           },
         }}
       >
@@ -52,7 +60,7 @@ export function TextReveal({
 
   // Split text into words, chars, or lines
   const renderContent = () => {
-    if (type === "chars") {
+    if (effectiveType === "chars") {
       return (
         <motion.span
           ref={ref}
@@ -63,7 +71,7 @@ export function TextReveal({
             hidden: {},
             visible: {
               transition: {
-                staggerChildren: staggerDelay,
+                staggerChildren: effectiveStaggerDelay,
                 delayChildren: delay,
               },
             },
@@ -74,11 +82,11 @@ export function TextReveal({
               key={index}
               className="inline-block"
               variants={{
-                hidden: { opacity: 0, y: 20 },
+                hidden: { opacity: 0, y: isMobile ? 10 : 20 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+                  transition: { duration: isMobile ? 0.3 : 0.4, ease: [0.22, 1, 0.36, 1] },
                 },
               }}
             >
@@ -89,7 +97,7 @@ export function TextReveal({
       )
     }
 
-    if (type === "words") {
+    if (effectiveType === "words") {
       const words = children.split(" ")
       return (
         <motion.span
@@ -101,7 +109,7 @@ export function TextReveal({
             hidden: {},
             visible: {
               transition: {
-                staggerChildren: staggerDelay,
+                staggerChildren: effectiveStaggerDelay,
                 delayChildren: delay,
               },
             },
@@ -112,11 +120,11 @@ export function TextReveal({
               key={index}
               className="inline-block"
               variants={{
-                hidden: { opacity: 0, y: 20 },
+                hidden: { opacity: 0, y: isMobile ? 10 : 20 },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+                  transition: { duration: isMobile ? 0.3 : 0.4, ease: [0.22, 1, 0.36, 1] },
                 },
               }}
             >
@@ -140,7 +148,7 @@ export function TextReveal({
           hidden: {},
           visible: {
             transition: {
-              staggerChildren: staggerDelay,
+              staggerChildren: effectiveStaggerDelay,
               delayChildren: delay,
             },
           },
@@ -151,11 +159,11 @@ export function TextReveal({
             key={index}
             className="block"
             variants={{
-              hidden: { opacity: 0, y: 20 },
+              hidden: { opacity: 0, y: isMobile ? 10 : 20 },
               visible: {
                 opacity: 1,
                 y: 0,
-                transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+                transition: { duration: isMobile ? 0.3 : 0.4, ease: [0.22, 1, 0.36, 1] },
               },
             }}
           >
