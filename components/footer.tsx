@@ -20,11 +20,10 @@ export function Footer() {
             <p className="text-[#E9E7E2]/60 mt-2">Brand Alchemy & Digital Strategy</p>
           </div>
           <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-8">
-            <FooterLink href="/#about">About</FooterLink>
-            <FooterLink href="/#services">Services</FooterLink>
+            <FooterLink href="/services">Services</FooterLink>
             <FooterLink href="/work">Work</FooterLink>
-            <FooterLink href="/#testimonials">Testimonials</FooterLink>
-            <FooterLink href="/#contact">Contact</FooterLink>
+            <FooterLink href="/testimonials">Testimonials</FooterLink>
+            <FooterLink href="/contact">Contact</FooterLink>
             <FooterLink href="/blog">Blog</FooterLink>
           </div>
         </div>

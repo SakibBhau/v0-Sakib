@@ -37,6 +37,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     }
   }, [isOpen])
 
+  // Function to check if a path is active
+  const isActive = (path: string) => {
+    if (path === "/") {
+      return pathname === "/"
+    }
+    return pathname.startsWith(path)
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -63,7 +71,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             <div className="flex flex-col h-full">
               <div className="flex justify-between items-center p-6 border-b border-[#333333]">
                 <Link href="/" className="text-[#FF5001] font-bold text-xl" onClick={onClose}>
-                  ZOOLYUM
+                  Sakib Chowdhury
                 </Link>
                 <button
                   onClick={onClose}
@@ -76,22 +84,19 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
               <nav className="flex-1 p-6">
                 <ul className="space-y-6">
-                  <MobileNavItem href="/#about" onClick={onClose}>
-                    About
-                  </MobileNavItem>
-                  <MobileNavItem href="/#services" onClick={onClose}>
+                  <MobileNavItem href="/services" onClick={onClose} isActive={isActive("/services")}>
                     Services
                   </MobileNavItem>
-                  <MobileNavItem href="/work" onClick={onClose}>
+                  <MobileNavItem href="/work" onClick={onClose} isActive={isActive("/work")}>
                     Work
                   </MobileNavItem>
-                  <MobileNavItem href="/#testimonials" onClick={onClose}>
+                  <MobileNavItem href="/testimonials" onClick={onClose} isActive={isActive("/testimonials")}>
                     Testimonials
                   </MobileNavItem>
-                  <MobileNavItem href="/#contact" onClick={onClose}>
+                  <MobileNavItem href="/contact" onClick={onClose} isActive={isActive("/contact")}>
                     Contact
                   </MobileNavItem>
-                  <MobileNavItem href="/blog" onClick={onClose}>
+                  <MobileNavItem href="/blog" onClick={onClose} isActive={isActive("/blog")}>
                     Blog
                   </MobileNavItem>
                 </ul>
@@ -99,7 +104,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
               <div className="p-6 border-t border-[#333333]">
                 <Link
-                  href="/#contact"
+                  href="/contact"
                   onClick={onClose}
                   className="block w-full py-3 px-4 bg-[#FF5001] text-[#161616] font-bold rounded-lg text-center hover:bg-[#FF5001]/90 transition-colors"
                 >
@@ -117,16 +122,19 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 interface MobileNavItemProps {
   href: string
   onClick: () => void
+  isActive: boolean
   children: React.ReactNode
 }
 
-function MobileNavItem({ href, onClick, children }: MobileNavItemProps) {
+function MobileNavItem({ href, onClick, isActive, children }: MobileNavItemProps) {
   return (
     <li>
       <Link
         href={href}
         onClick={onClick}
-        className="block text-xl font-medium text-[#E9E7E2] hover:text-[#FF5001] transition-colors"
+        className={`block text-xl font-medium transition-colors ${
+          isActive ? "text-[#FF5001]" : "text-[#E9E7E2] hover:text-[#FF5001]"
+        }`}
       >
         {children}
       </Link>

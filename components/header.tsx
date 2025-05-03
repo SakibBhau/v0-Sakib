@@ -7,9 +7,19 @@ import { Menu } from "lucide-react"
 import { MobileMenu } from "./mobile-menu"
 import { EnhancedLink, EnhancedButton } from "./interactive-elements"
 import { MagneticElement } from "./magnetic-element"
+import { usePathname } from "next/navigation"
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const pathname = usePathname()
+
+  // Function to check if a path is active
+  const isActive = (path: string) => {
+    if (path === "/") {
+      return pathname === "/"
+    }
+    return pathname.startsWith(path)
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#161616]/80 backdrop-blur-md">
@@ -26,12 +36,21 @@ export function Header() {
         </MagneticElement>
 
         <nav className="hidden md:flex space-x-8">
-          <NavLink href="/#about">About</NavLink>
-          <NavLink href="/#services">Services</NavLink>
-          <NavLink href="/work">Work</NavLink>
-          <NavLink href="/#testimonials">Testimonials</NavLink>
-          <NavLink href="/#contact">Contact</NavLink>
-          <NavLink href="/blog">Blog</NavLink>
+          <NavLink href="/services" isActive={isActive("/services")}>
+            Services
+          </NavLink>
+          <NavLink href="/work" isActive={isActive("/work")}>
+            Work
+          </NavLink>
+          <NavLink href="/testimonials" isActive={isActive("/testimonials")}>
+            Testimonials
+          </NavLink>
+          <NavLink href="/contact" isActive={isActive("/contact")}>
+            Contact
+          </NavLink>
+          <NavLink href="/blog" isActive={isActive("/blog")}>
+            Blog
+          </NavLink>
         </nav>
 
         <EnhancedButton
@@ -52,13 +71,16 @@ export function Header() {
 interface NavLinkProps {
   href: string
   children: React.ReactNode
+  isActive: boolean
 }
 
-function NavLink({ href, children }: NavLinkProps) {
+function NavLink({ href, children, isActive }: NavLinkProps) {
   return (
     <EnhancedLink
       href={href}
-      className="text-[#E9E7E2]/80 hover:text-[#FF5001] transition-colors duration-300"
+      className={`transition-colors duration-300 ${
+        isActive ? "text-[#FF5001] font-medium" : "text-[#E9E7E2]/80 hover:text-[#FF5001]"
+      }`}
       cursorText={children as string}
       effectType="pulse"
     >

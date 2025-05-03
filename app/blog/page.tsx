@@ -1,13 +1,14 @@
 "use client"
 
-import { ArrowRight, Calendar } from "lucide-react"
-import Image from "next/image"
+import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { PageTransition } from "@/components/page-transition"
-import { motion } from "framer-motion"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { BlogCard3D } from "@/components/blog-card-3d"
+import { ScrollReveal } from "@/components/scroll-animations/scroll-reveal"
+import { StaggerReveal } from "@/components/scroll-animations/stagger-reveal"
+import { TextReveal } from "@/components/scroll-animations/text-reveal"
 
 export default function BlogPage() {
   return (
@@ -18,23 +19,25 @@ export default function BlogPage() {
         <main className="pt-24">
           <section className="container mx-auto px-4 py-12">
             <div className="flex flex-col items-center text-center mb-16">
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+              <ScrollReveal>
                 <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">Insights</span>
-                <h1 className="text-4xl md:text-6xl font-bold mt-2 mb-4">Brand Alchemy Blog</h1>
+                <TextReveal type="words" className="text-4xl md:text-6xl font-bold mt-2 mb-4">
+                  Brand Alchemy Blog
+                </TextReveal>
                 <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto">
                   Thoughts, strategies, and insights on brand development, digital transformation, and market
                   positioning.
                 </p>
-              </motion.div>
+              </ScrollReveal>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {blogPosts.map((post, index) => (
                 <BlogCard3D key={index} post={post} index={index} />
               ))}
-            </div>
+            </StaggerReveal>
 
-            <div className="mt-16 flex justify-center">
+            <ScrollReveal className="mt-16 flex justify-center" delay={0.4}>
               <Link
                 href="/#contact"
                 className="px-8 py-4 bg-[#FF5001] text-[#161616] font-bold rounded-full hover:bg-[#FF5001]/90 transition-all duration-300 inline-flex items-center group"
@@ -42,51 +45,13 @@ export default function BlogPage() {
                 Subscribe to Newsletter
                 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
-            </div>
+            </ScrollReveal>
           </section>
         </main>
 
         <Footer />
       </div>
     </PageTransition>
-  )
-}
-
-function BlogCard({ post, index }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.5 }}
-      className="group"
-    >
-      <Link href={`/blog/${post.slug}`} className="block">
-        <div className="overflow-hidden rounded-xl">
-          <Image
-            src={post.image || "/placeholder.svg"}
-            alt={post.title}
-            width={600}
-            height={400}
-            className="w-full aspect-[3/2] object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        </div>
-        <div className="mt-4">
-          <div className="flex items-center text-[#E9E7E2]/60 text-sm mb-2">
-            <Calendar className="w-4 h-4 mr-2" />
-            <span>{post.date}</span>
-          </div>
-          <h3 className="text-xl font-bold group-hover:text-[#FF5001] transition-colors">{post.title}</h3>
-          <p className="text-[#E9E7E2]/70 mt-2">{post.excerpt}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {post.tags.map((tag, i) => (
-              <span key={i} className="px-3 py-1 bg-[#252525] rounded-full text-xs">
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      </Link>
-    </motion.div>
   )
 }
 

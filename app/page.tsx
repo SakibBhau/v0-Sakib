@@ -1,17 +1,18 @@
 "use client"
-
-import { useEffect, useRef } from "react"
-import { motion, useAnimation, useInView } from "framer-motion"
+import { motion } from "framer-motion"
 import { ArrowRight, Mail } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { PageTransition } from "@/components/page-transition"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { ScrollIndicator } from "@/components/scroll-animations"
-import { AnimatedLink, AnimatedButton } from "@/components/animated-link"
+import { ScrollIndicator } from "@/components/scroll-animations/scroll-indicator"
 import { ServiceCard3D } from "@/components/service-card-3d"
 import { TestimonialCard3D } from "@/components/testimonial-card-3d"
+import { ScrollReveal } from "@/components/scroll-animations/scroll-reveal"
+import { StaggerReveal } from "@/components/scroll-animations/stagger-reveal"
+import { TextReveal } from "@/components/scroll-animations/text-reveal"
+import { ImageReveal } from "@/components/scroll-animations/image-reveal"
 
 export default function Home() {
   return (
@@ -53,13 +54,15 @@ export default function Home() {
                 transition={{ delay: 4, duration: 0.8 }}
                 className="mt-12"
               >
-                <AnimatedButton
+                <Link
+                  href="/contact"
                   className="px-8 py-4 bg-[#FF5001] text-[#161616] font-bold rounded-full hover:bg-[#FF5001]/90 transition-all duration-300 inline-flex items-center group"
-                  cursorText="Connect"
+                  data-cursor="button"
+                  data-cursor-text="Connect"
                 >
                   Let's Connect
                   <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                </AnimatedButton>
+                </Link>
               </motion.div>
             </div>
 
@@ -71,25 +74,30 @@ export default function Home() {
           </section>
 
           {/* About Section */}
-          <AnimatedSection id="about">
+          <section id="about">
             <div className="container mx-auto px-4 py-20 md:py-32">
               <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div className="relative">
-                  <div className="relative z-10 rounded-2xl overflow-hidden">
-                    <Image
-                      src="/placeholder.svg?height=600&width=500"
-                      alt="Sakib Chowdhury"
-                      width={500}
-                      height={600}
-                      className="w-full h-auto object-cover"
-                    />
+                <ScrollReveal animation="fade-slide" direction="right">
+                  <div className="relative">
+                    <div className="relative z-10 rounded-2xl overflow-hidden">
+                      <ImageReveal
+                        src="/placeholder.svg?height=600&width=500"
+                        alt="Sakib Chowdhury"
+                        width={500}
+                        height={600}
+                        direction="left"
+                      />
+                    </div>
+                    <div className="absolute -bottom-6 -right-6 w-64 h-64 bg-[#FF5001]/20 rounded-full filter blur-xl z-0"></div>
+                    <div className="absolute -top-6 -left-6 w-32 h-32 bg-[#FF5001]/10 rounded-full filter blur-lg z-0"></div>
                   </div>
-                  <div className="absolute -bottom-6 -right-6 w-64 h-64 bg-[#FF5001]/20 rounded-full filter blur-xl z-0"></div>
-                  <div className="absolute -top-6 -left-6 w-32 h-32 bg-[#FF5001]/10 rounded-full filter blur-lg z-0"></div>
-                </div>
-                <div>
+                </ScrollReveal>
+
+                <ScrollReveal animation="fade-slide" direction="left" delay={0.2}>
                   <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">About Me</span>
-                  <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-8">The Visionary Behind Zoolyum</h2>
+                  <TextReveal className="text-4xl md:text-5xl font-bold mt-2 mb-8">
+                    The Visionary Behind Zoolyum
+                  </TextReveal>
                   <p className="text-lg text-[#E9E7E2]/80 mb-6">
                     As the founder of Zoolyum, I blend strategic thinking with creative innovation to transform brands
                     into powerful market forces. With over a decade of experience in digital strategy and brand
@@ -101,7 +109,7 @@ export default function Home() {
                     that not only capture attention but create lasting connections with audiences. I believe in the
                     power of storytelling and the art of strategic positioning to elevate brands beyond the ordinary.
                   </p>
-                  <div className="flex flex-wrap gap-4">
+                  <StaggerReveal className="flex flex-wrap gap-4" staggerDelay={0.05}>
                     <span className="px-4 py-2 border border-[#FF5001]/30 rounded-full text-sm">Brand Strategy</span>
                     <span className="px-4 py-2 border border-[#FF5001]/30 rounded-full text-sm">
                       Digital Transformation
@@ -112,113 +120,131 @@ export default function Home() {
                     <span className="px-4 py-2 border border-[#FF5001]/30 rounded-full text-sm">
                       Market Positioning
                     </span>
-                  </div>
-                </div>
+                  </StaggerReveal>
+                </ScrollReveal>
               </div>
             </div>
-          </AnimatedSection>
+          </section>
 
           {/* Services Section */}
-          <AnimatedSection id="services" className="bg-[#1A1A1A]">
+          <section id="services" className="bg-[#1A1A1A]">
             <div className="container mx-auto px-4 py-20 md:py-32">
-              <div className="text-center mb-16">
+              <ScrollReveal className="text-center mb-16">
                 <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">Services</span>
-                <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-4">Brand Alchemy Services</h2>
+                <TextReveal className="text-4xl md:text-5xl font-bold mt-2 mb-4">Brand Alchemy Services</TextReveal>
                 <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto">
                   Transforming visions into powerful brand realities through strategic thinking and creative excellence.
                 </p>
-              </div>
+              </ScrollReveal>
 
-              <div className="grid md:grid-cols-3 gap-8">
+              <StaggerReveal className="grid md:grid-cols-3 gap-8">
                 <ServiceCard3D
                   title="Brand Strategy"
                   description="Developing comprehensive brand strategies that position your business for success in competitive markets."
-                  delay={0.1}
                 />
                 <ServiceCard3D
                   title="Digital Strategy"
                   description="Creating digital ecosystems that amplify your brand's presence and engage audiences across platforms."
-                  delay={0.3}
                 />
                 <ServiceCard3D
                   title="Consultancy"
                   description="Providing expert guidance to navigate complex brand challenges and identify growth opportunities."
-                  delay={0.5}
                 />
-              </div>
+              </StaggerReveal>
+
+              <ScrollReveal className="mt-12 text-center" delay={0.3}>
+                <Link
+                  href="/services"
+                  className="px-8 py-4 bg-[#FF5001] text-[#161616] font-bold rounded-full hover:bg-[#FF5001]/90 transition-all duration-300 inline-flex items-center group"
+                  data-cursor="button"
+                  data-cursor-text="View Services"
+                >
+                  View All Services
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </ScrollReveal>
             </div>
-          </AnimatedSection>
+          </section>
 
           {/* Portfolio Section */}
-          <AnimatedSection id="portfolio">
+          <section id="portfolio">
             <div className="container mx-auto px-4 py-20 md:py-32">
-              <div className="text-center mb-16">
+              <ScrollReveal className="text-center mb-16">
                 <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">Portfolio</span>
-                <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-4">Featured Projects</h2>
+                <TextReveal className="text-4xl md:text-5xl font-bold mt-2 mb-4">Featured Projects</TextReveal>
                 <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto">
                   A showcase of transformative brand and digital strategy work across diverse industries.
                 </p>
-              </div>
+              </ScrollReveal>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <PortfolioItem title="Nexus Rebrand" category="Brand Strategy" delay={0.1} />
-                <PortfolioItem title="Elevate Digital Transformation" category="Digital Strategy" delay={0.2} />
-                <PortfolioItem title="Horizon Market Entry" category="Consultancy" delay={0.3} />
-                <PortfolioItem title="Pulse E-commerce" category="Digital Strategy" delay={0.4} />
-                <PortfolioItem title="Vertex Brand Identity" category="Brand Strategy" delay={0.5} />
-                <PortfolioItem title="Quantum Positioning" category="Consultancy" delay={0.6} />
-              </div>
+              <StaggerReveal className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <PortfolioItem title="Nexus Rebrand" category="Brand Strategy" />
+                <PortfolioItem title="Elevate Digital Transformation" category="Digital Strategy" />
+                <PortfolioItem title="Horizon Market Entry" category="Consultancy" />
+              </StaggerReveal>
+
+              <ScrollReveal className="mt-12 text-center" delay={0.3}>
+                <Link
+                  href="/work"
+                  className="px-8 py-4 bg-[#FF5001] text-[#161616] font-bold rounded-full hover:bg-[#FF5001]/90 transition-all duration-300 inline-flex items-center group"
+                  data-cursor="button"
+                  data-cursor-text="View Work"
+                >
+                  View All Projects
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </ScrollReveal>
             </div>
-          </AnimatedSection>
+          </section>
 
           {/* Testimonials Section */}
-          <AnimatedSection id="testimonials" className="bg-[#1A1A1A]">
+          <section id="testimonials" className="bg-[#1A1A1A]">
             <div className="container mx-auto px-4 py-20 md:py-32">
-              <div className="text-center mb-16">
+              <ScrollReveal className="text-center mb-16">
                 <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">Testimonials</span>
-                <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-4">Client Success Stories</h2>
+                <TextReveal className="text-4xl md:text-5xl font-bold mt-2 mb-4">Client Success Stories</TextReveal>
                 <p className="text-lg text-[#E9E7E2]/80 max-w-2xl mx-auto">
                   Hear from the brands and businesses that have experienced the transformative power of strategic
                   alchemy.
                 </p>
-              </div>
+              </ScrollReveal>
 
-              <div className="grid md:grid-cols-2 gap-8">
+              <StaggerReveal className="grid md:grid-cols-2 gap-8">
                 <TestimonialCard3D
                   quote="Sakib's strategic approach completely transformed our brand positioning. His insights helped us connect with our audience in ways we never thought possible."
                   author="Sarah Johnson"
                   company="CEO, Nexus Technologies"
-                  delay={0.1}
                 />
                 <TestimonialCard3D
                   quote="Working with Zoolyum was a game-changer for our digital presence. The strategic vision and creative execution exceeded our expectations at every turn."
                   author="Michael Chen"
                   company="Marketing Director, Elevate"
-                  delay={0.3}
                 />
-                <TestimonialCard3D
-                  quote="Sakib has an incredible ability to identify the essence of a brand and translate it into powerful market positioning. His work was instrumental to our success."
-                  author="Jessica Williams"
-                  company="Founder, Horizon"
-                  delay={0.5}
-                />
-                <TestimonialCard3D
-                  quote="The depth of strategic thinking combined with creative excellence makes Zoolyum truly unique. Our brand transformation has driven measurable business results."
-                  author="David Rodriguez"
-                  company="COO, Pulse"
-                  delay={0.7}
-                />
-              </div>
+              </StaggerReveal>
+
+              <ScrollReveal className="mt-12 text-center" delay={0.3}>
+                <Link
+                  href="/testimonials"
+                  className="px-8 py-4 bg-[#FF5001] text-[#161616] font-bold rounded-full hover:bg-[#FF5001]/90 transition-all duration-300 inline-flex items-center group"
+                  data-cursor="button"
+                  data-cursor-text="View Testimonials"
+                >
+                  View All Testimonials
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </ScrollReveal>
             </div>
-          </AnimatedSection>
+          </section>
 
           {/* Contact Section */}
-          <AnimatedSection id="contact">
+          <section id="contact">
             <div className="container mx-auto px-4 py-20 md:py-32">
               <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div>
+                <ScrollReveal animation="fade-slide" direction="right">
                   <span className="text-[#FF5001] text-sm uppercase tracking-widest font-medium">Contact</span>
-                  <h2 className="text-4xl md:text-5xl font-bold mt-2 mb-8">Let's Create Something Extraordinary</h2>
+                  <TextReveal className="text-4xl md:text-5xl font-bold mt-2 mb-8">
+                    Let's Create Something Extraordinary
+                  </TextReveal>
                   <p className="text-lg text-[#E9E7E2]/80 mb-8">
                     Ready to transform your brand through strategic alchemy? Let's connect and explore how we can
                     elevate your business to new heights.
@@ -229,59 +255,35 @@ export default function Home() {
                       hello@zoolyum.com
                     </a>
                   </div>
-                  <div className="flex space-x-4 mt-8">
+                  <StaggerReveal className="flex space-x-4 mt-8" staggerDelay={0.1}>
                     <SocialIcon name="twitter" />
                     <SocialIcon name="linkedin" />
                     <SocialIcon name="instagram" />
                     <SocialIcon name="behance" />
-                  </div>
-                </div>
-                <div>
-                  <form className="bg-[#1A1A1A] p-8 rounded-2xl">
-                    <div className="mb-6">
-                      <label htmlFor="name" className="block text-sm font-medium mb-2">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        className="w-full px-4 py-3 bg-[#252525] border border-[#333333] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5001]/50 text-[#E9E7E2]"
-                        placeholder="Your name"
-                      />
-                    </div>
-                    <div className="mb-6">
-                      <label htmlFor="email" className="block text-sm font-medium mb-2">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        className="w-full px-4 py-3 bg-[#252525] border border-[#333333] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5001]/50 text-[#E9E7E2]"
-                        placeholder="Your email"
-                      />
-                    </div>
-                    <div className="mb-6">
-                      <label htmlFor="message" className="block text-sm font-medium mb-2">
-                        Message
-                      </label>
-                      <textarea
-                        id="message"
-                        rows={5}
-                        className="w-full px-4 py-3 bg-[#252525] border border-[#333333] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5001]/50 text-[#E9E7E2]"
-                        placeholder="Tell me about your project"
-                      ></textarea>
-                    </div>
-                    <button
-                      type="submit"
-                      className="w-full px-6 py-4 bg-[#FF5001] text-[#161616] font-bold rounded-lg hover:bg-[#FF5001]/90 transition-all duration-300"
-                    >
-                      Send Message
-                    </button>
-                  </form>
-                </div>
+                  </StaggerReveal>
+                </ScrollReveal>
+
+                <ScrollReveal animation="fade-slide" direction="left" delay={0.3}>
+                  <Link
+                    href="/contact"
+                    className="block w-full p-8 bg-[#1A1A1A] rounded-2xl border border-[#333333] hover:border-[#FF5001] transition-all duration-300 text-center"
+                    data-cursor="button"
+                    data-cursor-text="Contact"
+                  >
+                    <h3 className="text-2xl font-bold mb-4">Get in Touch</h3>
+                    <p className="text-[#E9E7E2]/80 mb-6">
+                      Ready to discuss your project? Visit our contact page to send a message or schedule a
+                      consultation.
+                    </p>
+                    <span className="inline-flex items-center text-[#FF5001] font-medium">
+                      Contact Us
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </span>
+                  </Link>
+                </ScrollReveal>
               </div>
             </div>
-          </AnimatedSection>
+          </section>
         </main>
 
         <Footer />
@@ -445,45 +447,10 @@ function NameAnimation() {
   )
 }
 
-// Animated Section Component
-function AnimatedSection({ children, id, className = "" }) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.2 })
-  const controls = useAnimation()
-
-  useEffect(() => {
-    if (isInView) {
-      controls.start("visible")
-    }
-  }, [controls, isInView])
-
+// Portfolio Item Component
+function PortfolioItem({ title, category }) {
   return (
-    <section id={id} ref={ref} className={className}>
-      <motion.div
-        variants={{
-          hidden: { opacity: 0, y: 50 },
-          visible: { opacity: 1, y: 0 },
-        }}
-        initial="hidden"
-        animate={controls}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-      >
-        {children}
-      </motion.div>
-    </section>
-  )
-}
-
-// Service Card Component
-function PortfolioItem({ title, category, delay = 0 }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ delay, duration: 0.5 }}
-      className="group relative overflow-hidden rounded-xl"
-    >
+    <div className="group relative overflow-hidden rounded-xl">
       <div className="aspect-[4/3] bg-[#212121] overflow-hidden">
         <Image
           src="/placeholder.svg?height=300&width=400"
@@ -496,15 +463,15 @@ function PortfolioItem({ title, category, delay = 0 }) {
       <div className="absolute inset-0 bg-gradient-to-t from-[#161616] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
         <span className="text-[#FF5001] text-sm">{category}</span>
         <h3 className="text-xl font-bold mt-2">{title}</h3>
-        <AnimatedLink
-          href="#"
+        <Link
+          href="/work"
           className="mt-4 inline-flex items-center text-[#E9E7E2] hover:text-[#FF5001] transition-colors"
         >
           View Project
           <ArrowRight className="ml-2 w-4 h-4" />
-        </AnimatedLink>
+        </Link>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -525,13 +492,5 @@ function SocialIcon({ name }) {
         />
       </svg>
     </a>
-  )
-}
-
-function NavLink({ href, children }) {
-  return (
-    <Link href={href} className="text-[#E9E7E2]/60 hover:text-[#FF5001] transition-colors">
-      {children}
-    </Link>
   )
 }
