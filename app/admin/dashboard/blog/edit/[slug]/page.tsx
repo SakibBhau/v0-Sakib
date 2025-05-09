@@ -2,20 +2,21 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
-import { createBlogPost } from "@/lib/blog-operations"
+import { fetchBlogPost, updateBlogPost } from "@/lib/blog-operations"
 import { PageTransition } from "@/components/page-transition"
-import { Save, X } from "lucide-react"
+import { Save, X, Loader2 } from "lucide-react"
 import { ImageUploader } from "@/components/admin/image-uploader"
 import { RichTextEditor } from "@/components/admin/rich-text-editor"
 import { useToast } from "@/hooks/use-toast"
 
-export default function NewBlogPostPage() {
+export default function EditBlogPostPage({ params }: { params: { slug: string } }) {
   const { user } = useAuth()
   const { toast } = useToast()
   const [formData, setFormData] = useState({
+    id: 0,
     title: "",
     slug: "",
     excerpt: "",
@@ -24,31 +25,48 @@ export default function NewBlogPostPage() {
     tags: "",
     status: "draft",
   })
+  const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
+  useEffect(() => {
+    const loadPost = async () => {
+      try {
+        setIsLoading(true)
+        const post = await fetchBlogPost(params.slug)
+
+        // Format tags if they're an array
+        let formattedTags = post.tags
+        if (Array.isArray(post.tags)) {
+          formattedTags = post.tags.join(", ")
+        }
+
+        setFormData({
+          ...post,
+          tags: formattedTags,
+        })
+      } catch (err: any) {
+        setError(err.message || "Failed to load blog post")
+        toast({
+          title: "Error",
+          description: err.message || "Failed to load blog post",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadPost()
+  }, [params.slug, toast])
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-
-    // Auto-generate slug from title
-    if (name === "title") {
-      const slug = value
-        .toLowerCase()
-        .replace(/[^\w\s]/gi, "")
-        .replace(/\s+/g, "-")
-
-      setFormData({
-        ...formData,
-        title: value,
-        slug,
-      })
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      })
-    }
+    setFormData({
+      ...formData,
+      [name]: value,
+    })
   }
 
   const handleContentChange = (content: string) => {
@@ -72,25 +90,20 @@ export default function NewBlogPostPage() {
 
     try {
       if (!user) {
-        throw new Error("You must be logged in to create a post")
+        throw new Error("You must be logged in to update a post")
       }
 
-      const postData = {
-        ...formData,
-        author_id: user.id,
-      }
-
-      await createBlogPost(postData)
+      await updateBlogPost(formData.id, formData)
       toast({
         title: "Success",
-        description: "Blog post created successfully",
+        description: "Blog post updated successfully",
       })
       router.push("/admin/dashboard/blog")
     } catch (err: any) {
-      setError(err.message || "An error occurred while creating the post")
+      setError(err.message || "An error occurred while updating the post")
       toast({
         title: "Error",
-        description: err.message || "An error occurred while creating the post",
+        description: err.message || "An error occurred while updating the post",
         variant: "destructive",
       })
       setIsSubmitting(false)
@@ -101,11 +114,21 @@ export default function NewBlogPostPage() {
     router.push("/admin/dashboard/blog")
   }
 
+  if (isLoading) {
+    return (
+      <PageTransition>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-[#FF5001]" />
+        </div>
+      </PageTransition>
+    )
+  }
+
   return (
     <PageTransition>
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">New Blog Post</h1>
+          <h1 className="text-3xl font-bold">Edit Blog Post</h1>
           <div className="flex space-x-3">
             <button
               onClick={handleCancel}
@@ -121,7 +144,7 @@ export default function NewBlogPostPage() {
               disabled={isSubmitting}
             >
               <Save className="mr-2 h-5 w-5" />
-              {isSubmitting ? "Saving..." : "Save Post"}
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </div>
