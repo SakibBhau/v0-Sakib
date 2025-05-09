@@ -34,7 +34,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Fetch admin user data
   const fetchAdminUser = async (userId: string) => {
     try {
-      const { data, error } = await supabase.from("admin_users").select("*").eq("id", userId).single()
+      // Changed from .single() to get() and then check if data exists
+      const { data, error } = await supabase.from("admin_users").select("*").eq("id", userId).maybeSingle() // Use maybeSingle() instead of single()
 
       if (error) {
         console.error("Error fetching admin user:", error)

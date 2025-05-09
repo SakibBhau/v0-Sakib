@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { getBrowserClient } from "@/lib/supabase"
 import { PageTransition } from "@/components/page-transition"
@@ -35,9 +35,9 @@ export default function AdminSignupPage() {
   }
 
   // Check on component mount
-  useState(() => {
+  useEffect(() => {
     checkExistingAdmins()
-  })
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -61,18 +61,24 @@ export default function AdminSignupPage() {
         throw new Error("Failed to create user")
       }
 
-      // 2. Insert the user into our admin_users table
-      const { error: insertError } = await supabase.from("admin_users").insert([
-        {
-          id: authData.user.id,
+      // 2. Call our API route to insert the admin user
+      const response = await fetch("/api/admin/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: authData.user.id,
           email,
           name,
-          role: isFirstAdmin ? "admin" : "editor", // First user is admin, others are editors
-        },
-      ])
+          isFirstAdmin,
+        }),
+      })
 
-      if (insertError) {
-        throw insertError
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create admin user")
       }
 
       // 3. Redirect to login page
