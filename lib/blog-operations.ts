@@ -37,6 +37,42 @@ export async function createBlogPost(postData: any) {
       .filter(Boolean)
   }
 
+  // First, check if the admin user exists in the admin_users table
+  const { data: adminUser, error: adminError } = await supabase
+    .from("admin_users")
+    .select("id")
+    .eq("id", postData.author_id)
+    .single()
+
+  if (adminError || !adminUser) {
+    console.error("Admin user not found in admin_users table. Attempting to create entry.", adminError)
+
+    // Get user details from auth
+    const { data: userData, error: userError } = await supabase.auth.getUser()
+
+    if (userError || !userData.user) {
+      throw new Error("Could not retrieve user information")
+    }
+
+    // Create an entry in the admin_users table
+    const { error: insertError } = await supabase.from("admin_users").insert([
+      {
+        id: userData.user.id,
+        email: userData.user.email,
+        name: userData.user.email?.split("@")[0] || "Admin User",
+        role: "admin",
+      },
+    ])
+
+    if (insertError) {
+      console.error("Error creating admin user entry:", insertError)
+      throw new Error("Failed to create admin user record. Please complete the admin registration process.")
+    }
+
+    // Use the newly created admin user ID
+    postData.author_id = userData.user.id
+  }
+
   const { data, error } = await supabase.from("blog_posts").insert([postData]).select()
 
   if (error) {

@@ -7,10 +7,11 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { createBlogPost } from "@/lib/blog-operations"
 import { PageTransition } from "@/components/page-transition"
-import { Save, X } from "lucide-react"
+import { Save, X, InfoIcon } from "lucide-react"
 import { ImageUploader } from "@/components/admin/image-uploader"
 import { RichTextEditor } from "@/components/admin/rich-text-editor"
 import { useToast } from "@/hooks/use-toast"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export default function NewBlogPostPage() {
   const { user } = useAuth()
@@ -52,17 +53,23 @@ export default function NewBlogPostPage() {
   }
 
   const handleContentChange = (content: string) => {
-    setFormData({
-      ...formData,
-      content,
+    setFormData((prev) => {
+      // Only update if content has actually changed
+      if (prev.content !== content) {
+        return {
+          ...prev,
+          content,
+        }
+      }
+      return prev
     })
   }
 
   const handleImageChange = (url: string | null) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       image_url: url || "",
-    })
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -130,6 +137,15 @@ export default function NewBlogPostPage() {
           <div className="mb-6 p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400">{error}</div>
         )}
 
+        <Alert className="mb-6">
+          <InfoIcon className="h-4 w-4" />
+          <AlertTitle>Using External Images</AlertTitle>
+          <AlertDescription>
+            The Supabase storage bucket is not set up yet. Please use external image URLs for now. You can upload images
+            to services like Imgur, ImgBB, or PostImages and then use the URL.
+          </AlertDescription>
+        </Alert>
+
         <form onSubmit={handleSubmit} className="bg-[#1A1A1A] rounded-xl border border-[#333333] p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
@@ -186,6 +202,7 @@ export default function NewBlogPostPage() {
               initialImageUrl={formData.image_url}
               onImageChange={handleImageChange}
               helpText="Upload a featured image for your blog post (16:9 ratio recommended)"
+              folder="blog-thumbnails"
             />
           </div>
 
@@ -198,6 +215,7 @@ export default function NewBlogPostPage() {
               onChange={handleContentChange}
               placeholder="Write your post content here..."
               minHeight="400px"
+              folder="blog-content"
             />
           </div>
 

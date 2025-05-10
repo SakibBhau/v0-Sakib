@@ -3,8 +3,21 @@
 import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
-import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { uploadImage } from "@/lib/upload-operations"
+import { useToast } from "@/hooks/use-toast"
 import {
   Bold,
   Italic,
@@ -15,51 +28,150 @@ import {
   Heading1,
   Heading2,
   Heading3,
-  Quote,
-  Code,
-  Undo,
-  Redo,
-  Loader2,
+  AlertCircle,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface RichTextEditorProps {
-  initialValue: string
-  onChange: (value: string) => void
+  initialValue?: string
+  onChange: (content: string) => void
   placeholder?: string
   minHeight?: string
+  folder?: string
 }
 
 export function RichTextEditor({
-  initialValue,
+  initialValue = "",
   onChange,
   placeholder = "Write your content here...",
   minHeight = "300px",
+  folder = "blog",
 }: RichTextEditorProps) {
   const [content, setContent] = useState(initialValue)
+  const [imageUrl, setImageUrl] = useState("")
+  const [imageAlt, setImageAlt] = useState("")
+  const [externalUrl, setExternalUrl] = useState("")
   const [isUploading, setIsUploading] = useState(false)
-  const editorRef = useRef<HTMLDivElement>(null)
+  const [imageDialogOpen, setImageDialogOpen] = useState(false)
+  const [linkUrl, setLinkUrl] = useState("")
+  const [linkText, setLinkText] = useState("")
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<string>("url") // Default to URL tab
+  const [bucketError, setBucketError] = useState(false)
+  const editorRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
 
+  // Set initial content once on mount
   useEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.innerHTML = initialValue
-    }
+    setContent(initialValue)
   }, [initialValue])
 
-  const handleContentChange = () => {
-    if (editorRef.current) {
-      const newContent = editorRef.current.innerHTML
-      setContent(newContent)
-      onChange(newContent)
+  // Check for storage bucket on component mount
+  useEffect(() => {
+    const checkBucket = async () => {
+      try {
+        // Create a small test file
+        const testFile = new File(["test"], "test.txt", { type: "text/plain" })
+
+        // Try to upload it
+        const result = await uploadImage(testFile, "test")
+
+        // If there's a bucket error, set the state
+        if (result.bucketMissing) {
+          setBucketError(true)
+          setActiveTab("url")
+        } else {
+          // If upload succeeded, delete the test file
+          setActiveTab("upload") // Only set to upload if bucket exists
+        }
+      } catch (err) {
+        console.error("Error checking storage bucket:", err)
+        setBucketError(true)
+        setActiveTab("url")
+      }
     }
+
+    checkBucket()
+  }, [])
+
+  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newContent = e.target.value
+    setContent(newContent)
+    onChange(newContent)
   }
 
-  const execCommand = (command: string, value = "") => {
-    document.execCommand(command, false, value)
-    handleContentChange()
-    editorRef.current?.focus()
+  const insertAtCursor = (textToInsert: string) => {
+    if (!editorRef.current) return
+
+    const start = editorRef.current.selectionStart
+    const end = editorRef.current.selectionEnd
+    const text = editorRef.current.value
+    const before = text.substring(0, start)
+    const after = text.substring(end, text.length)
+
+    const newContent = before + textToInsert + after
+    setContent(newContent)
+    onChange(newContent)
+
+    // Set cursor position after the inserted text
+    setTimeout(() => {
+      if (editorRef.current) {
+        editorRef.current.focus()
+        editorRef.current.selectionStart = start + textToInsert.length
+        editorRef.current.selectionEnd = start + textToInsert.length
+      }
+    }, 0)
+  }
+
+  const getSelectedText = () => {
+    if (!editorRef.current) return ""
+    const start = editorRef.current.selectionStart
+    const end = editorRef.current.selectionEnd
+    return editorRef.current.value.substring(start, end)
+  }
+
+  const formatText = (format: string) => {
+    const selectedText = getSelectedText()
+    let formattedText = ""
+
+    switch (format) {
+      case "bold":
+        formattedText = `**${selectedText || "bold text"}**`
+        break
+      case "italic":
+        formattedText = `*${selectedText || "italic text"}*`
+        break
+      case "h1":
+        formattedText = `\n# ${selectedText || "Heading 1"}\n`
+        break
+      case "h2":
+        formattedText = `\n## ${selectedText || "Heading 2"}\n`
+        break
+      case "h3":
+        formattedText = `\n### ${selectedText || "Heading 3"}\n`
+        break
+      case "ul":
+        formattedText = selectedText
+          ? selectedText
+              .split("\n")
+              .map((line) => `- ${line}`)
+              .join("\n")
+          : "- List item\n- Another item"
+        break
+      case "ol":
+        formattedText = selectedText
+          ? selectedText
+              .split("\n")
+              .map((line, i) => `${i + 1}. ${line}`)
+              .join("\n")
+          : "1. List item\n2. Another item"
+        break
+      default:
+        formattedText = selectedText
+    }
+
+    insertAtCursor(formattedText)
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +202,7 @@ export function RichTextEditor({
     setIsUploading(true)
 
     try {
-      const result = await uploadImage(file)
+      const result = await uploadImage(file, folder)
 
       if (result.error) {
         toast({
@@ -98,12 +210,16 @@ export function RichTextEditor({
           description: result.error,
           variant: "destructive",
         })
+
+        if (result.bucketMissing) {
+          setBucketError(true)
+          setActiveTab("url")
+        }
       } else if (result.url) {
-        // Insert the image at the current cursor position
-        execCommand("insertImage", result.url)
+        setImageUrl(result.url)
         toast({
-          title: "Image uploaded",
-          description: "Image has been inserted into the content",
+          title: "Upload successful",
+          description: "Image has been uploaded successfully",
         })
       }
     } catch (err) {
@@ -112,6 +228,8 @@ export function RichTextEditor({
         description: "An unexpected error occurred during upload",
         variant: "destructive",
       })
+      setBucketError(true)
+      setActiveTab("url")
     } finally {
       setIsUploading(false)
       // Reset the file input
@@ -121,123 +239,229 @@ export function RichTextEditor({
     }
   }
 
-  const handleLinkInsert = () => {
-    const url = prompt("Enter the URL:")
-    if (url) {
-      execCommand("createLink", url)
+  const insertImage = () => {
+    const url = activeTab === "upload" ? imageUrl : externalUrl
+    if (!url) {
+      toast({
+        title: "No image selected",
+        description: "Please upload an image or enter an image URL",
+        variant: "destructive",
+      })
+      return
     }
+
+    const alt = imageAlt || "Image"
+    const markdown = `![${alt}](${url})`
+    insertAtCursor(markdown)
+
+    // Reset form
+    setImageUrl("")
+    setImageAlt("")
+    setExternalUrl("")
+    setImageDialogOpen(false)
+  }
+
+  const insertLink = () => {
+    if (!linkUrl) {
+      toast({
+        title: "No URL entered",
+        description: "Please enter a URL for the link",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const text = linkText || linkUrl
+    const markdown = `[${text}](${linkUrl})`
+    insertAtCursor(markdown)
+
+    // Reset form
+    setLinkUrl("")
+    setLinkText("")
+    setLinkDialogOpen(false)
   }
 
   return (
-    <div className="border border-gray-200 dark:border-gray-800 rounded-md overflow-hidden">
-      <div className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 p-2 flex flex-wrap gap-1">
-        <Button type="button" variant="ghost" size="icon" onClick={() => execCommand("bold")} title="Bold">
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2 p-2 bg-[#252525] border border-[#333333] rounded-t-lg">
+        <Button type="button" variant="ghost" size="sm" onClick={() => formatText("bold")}>
           <Bold className="h-4 w-4" />
+          <span className="sr-only">Bold</span>
         </Button>
-        <Button type="button" variant="ghost" size="icon" onClick={() => execCommand("italic")} title="Italic">
+        <Button type="button" variant="ghost" size="sm" onClick={() => formatText("italic")}>
           <Italic className="h-4 w-4" />
+          <span className="sr-only">Italic</span>
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => execCommand("insertUnorderedList")}
-          title="Bullet List"
-        >
-          <List className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => execCommand("insertOrderedList")}
-          title="Numbered List"
-        >
-          <ListOrdered className="h-4 w-4" />
-        </Button>
-        <Button type="button" variant="ghost" size="icon" onClick={handleLinkInsert} title="Insert Link">
-          <Link className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
-          title="Insert Image"
-        >
-          {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
-        </Button>
-        <input
-          type="file"
-          ref={fileInputRef}
-          className="hidden"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          onChange={handleImageUpload}
-        />
-        <div className="border-l border-gray-200 dark:border-gray-700 mx-1 h-6" />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => execCommand("formatBlock", "<h1>")}
-          title="Heading 1"
-        >
+        <Button type="button" variant="ghost" size="sm" onClick={() => formatText("h1")}>
           <Heading1 className="h-4 w-4" />
+          <span className="sr-only">Heading 1</span>
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => execCommand("formatBlock", "<h2>")}
-          title="Heading 2"
-        >
+        <Button type="button" variant="ghost" size="sm" onClick={() => formatText("h2")}>
           <Heading2 className="h-4 w-4" />
+          <span className="sr-only">Heading 2</span>
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => execCommand("formatBlock", "<h3>")}
-          title="Heading 3"
-        >
+        <Button type="button" variant="ghost" size="sm" onClick={() => formatText("h3")}>
           <Heading3 className="h-4 w-4" />
+          <span className="sr-only">Heading 3</span>
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => execCommand("formatBlock", "<blockquote>")}
-          title="Quote"
-        >
-          <Quote className="h-4 w-4" />
+        <Button type="button" variant="ghost" size="sm" onClick={() => formatText("ul")}>
+          <List className="h-4 w-4" />
+          <span className="sr-only">Bullet List</span>
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => execCommand("formatBlock", "<pre>")}
-          title="Code Block"
-        >
-          <Code className="h-4 w-4" />
+        <Button type="button" variant="ghost" size="sm" onClick={() => formatText("ol")}>
+          <ListOrdered className="h-4 w-4" />
+          <span className="sr-only">Numbered List</span>
         </Button>
-        <div className="border-l border-gray-200 dark:border-gray-700 mx-1 h-6" />
-        <Button type="button" variant="ghost" size="icon" onClick={() => execCommand("undo")} title="Undo">
-          <Undo className="h-4 w-4" />
-        </Button>
-        <Button type="button" variant="ghost" size="icon" onClick={() => execCommand("redo")} title="Redo">
-          <Redo className="h-4 w-4" />
-        </Button>
+
+        <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
+          <DialogTrigger asChild>
+            <Button type="button" variant="ghost" size="sm">
+              <ImageIcon className="h-4 w-4" />
+              <span className="sr-only">Insert Image</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Insert Image</DialogTitle>
+              <DialogDescription>Upload an image or enter an image URL.</DialogDescription>
+            </DialogHeader>
+
+            {bucketError && (
+              <Alert variant="warning" className="mb-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Storage Not Available</AlertTitle>
+                <AlertDescription>Please use the Image URL tab to add images from external sources.</AlertDescription>
+              </Alert>
+            )}
+
+            <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="upload" disabled={bucketError}>
+                  Upload Image
+                </TabsTrigger>
+                <TabsTrigger value="url">Image URL</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="upload" className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="image-upload">Upload Image</Label>
+                  <Input
+                    id="image-upload"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    onChange={handleImageUpload}
+                    ref={fileInputRef}
+                    disabled={bucketError}
+                  />
+                  <p className="text-xs text-gray-500">Max file size: 5MB</p>
+                </div>
+
+                {imageUrl && (
+                  <div className="space-y-2">
+                    <Label>Preview</Label>
+                    <div className="border border-gray-200 dark:border-gray-800 rounded-md p-2">
+                      <img src={imageUrl || "/placeholder.svg"} alt="Preview" className="max-h-40 mx-auto" />
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="url" className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="external-image-url">Image URL</Label>
+                  <Input
+                    id="external-image-url"
+                    type="url"
+                    placeholder="https://example.com/image.jpg"
+                    value={externalUrl}
+                    onChange={(e) => setExternalUrl(e.target.value)}
+                  />
+                  <p className="text-xs text-gray-500">
+                    Enter the URL of an image hosted elsewhere (e.g., Imgur, ImgBB)
+                  </p>
+                </div>
+              </TabsContent>
+            </Tabs>
+
+            <div className="space-y-2">
+              <Label htmlFor="image-alt">Alt Text</Label>
+              <Input
+                id="image-alt"
+                placeholder="Description of the image"
+                value={imageAlt}
+                onChange={(e) => setImageAlt(e.target.value)}
+              />
+              <p className="text-xs text-gray-500">Provide a description for screen readers</p>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setImageDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="button" onClick={insertImage} disabled={isUploading}>
+                {isUploading ? "Uploading..." : "Insert Image"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>
+          <DialogTrigger asChild>
+            <Button type="button" variant="ghost" size="sm">
+              <Link className="h-4 w-4" />
+              <span className="sr-only">Insert Link</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Insert Link</DialogTitle>
+              <DialogDescription>Add a hyperlink to your content.</DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="link-url">URL</Label>
+                <Input
+                  id="link-url"
+                  type="url"
+                  placeholder="https://example.com"
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="link-text">Link Text</Label>
+                <Input
+                  id="link-text"
+                  placeholder="Click here"
+                  value={linkText}
+                  onChange={(e) => setLinkText(e.target.value)}
+                />
+                <p className="text-xs text-gray-500">Leave empty to use the URL as link text</p>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setLinkDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="button" onClick={insertLink}>
+                Insert Link
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
-      <div
+
+      <textarea
         ref={editorRef}
-        contentEditable
-        className="p-4 focus:outline-none prose dark:prose-invert max-w-none prose-img:rounded-md prose-img:mx-auto"
-        style={{ minHeight }}
-        onInput={handleContentChange}
-        onBlur={handleContentChange}
-        dangerouslySetInnerHTML={{ __html: initialValue }}
+        value={content}
+        onChange={handleContentChange}
+        className="w-full px-4 py-3 bg-[#252525] border border-[#333333] rounded-b-lg focus:outline-none focus:ring-2 focus:ring-[#FF5001]/50 text-[#E9E7E2] font-mono"
         placeholder={placeholder}
+        rows={10}
+        style={{ minHeight }}
       />
     </div>
   )
