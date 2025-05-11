@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { createBlogPost } from "@/lib/blog-operations"
 import { PageTransition } from "@/components/page-transition"
-import { Save, X, InfoIcon } from "lucide-react"
+import { Save, X, InfoIcon, AlertTriangle } from "lucide-react"
 import { ImageUploader } from "@/components/admin/image-uploader"
 import { RichTextEditor } from "@/components/admin/rich-text-editor"
 import { useToast } from "@/hooks/use-toast"
@@ -94,12 +94,14 @@ export default function NewBlogPostPage() {
       })
       router.push("/admin/dashboard/blog")
     } catch (err: any) {
+      console.error("Error submitting blog post:", err)
       setError(err.message || "An error occurred while creating the post")
       toast({
         title: "Error",
         description: err.message || "An error occurred while creating the post",
         variant: "destructive",
       })
+    } finally {
       setIsSubmitting(false)
     }
   }
@@ -134,8 +136,20 @@ export default function NewBlogPostPage() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400">{error}</div>
+          <Alert variant="destructive" className="mb-6">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
+
+        <Alert className="mb-6">
+          <InfoIcon className="h-4 w-4" />
+          <AlertTitle>First-time Post Creation</AlertTitle>
+          <AlertDescription>
+            If this is your first time creating a post, the system will automatically register you as an admin author.
+          </AlertDescription>
+        </Alert>
 
         <Alert className="mb-6">
           <InfoIcon className="h-4 w-4" />
